@@ -219,8 +219,10 @@ def game_status_refresh(player_id, players_houses, battlefield):
 print("pr01.py starting...")
 
 players_num = 4
+player_victories = []
 
 chart_run = 0
+run_counter = 0
 player_id = 0
 game_status = 1
 
@@ -228,7 +230,10 @@ if len(sys.argv) > 1:
     # PyChart run requested, using sys.argv[1] as run count
     chart_run = 1
     run_counter = int(sys.argv[1]) - 1
-    player_victories = [0, 0, 0, 0] # UGLY CODE!!! > Init manually for appropriate players count
+    i = 0
+    while i < players_num:
+        player_victories.append(0)
+        i += 1
 
 print("Init battlefield...")
 battlefield = init_battlefield()
@@ -269,10 +274,9 @@ while game_status != 0:
             player_id = 0
 
 # Generate graph
-if len(sys.argv) > 1:
+if chart_run == 1:
     data = [go.Bar(
             x=['finish_one_by_one', 'max_on_board', 'aggressive', 'smart_ai'],
             y=player_victories
     )]
-
-plotly.offline.plot(data, filename='basic-bar')
+    plotly.offline.plot(data, filename='basic-bar')
