@@ -2,7 +2,7 @@
 Project 01, IB111, FI MU
 
 # Requirements
-Python3 with ![plotly](https://pypi.python.org/pypi/plotly)
+Python3 with [plotly](https://pypi.python.org/pypi/plotly)
 
 # Usage
 ## Single run:
