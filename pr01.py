@@ -12,6 +12,7 @@ Author: František Zatloukal
 import random
 import sys
 
+import plotly
 import plotly.plotly as py
 import plotly.graph_objs as go
 
@@ -274,4 +275,4 @@ if len(sys.argv) > 1:
             y=player_victories
     )]
 
-py.iplot(data, filename='basic-bar')
+plotly.offline.plot(data, filename='basic-bar')
