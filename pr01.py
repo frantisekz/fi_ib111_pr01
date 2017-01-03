@@ -13,12 +13,14 @@ import random
 import sys
 
 import plotly
-import plotly.plotly as py
 import plotly.graph_objs as go
 
 # AI Functions begin
 def finish_one_by_one(player_id, players_houses, battlefield, roll):
-    # stupid AI
+    """
+    Simple AI
+    Will deploy only up to one
+    """
     i = 0
     battlefield_field = ""
     our_position = -1
@@ -38,7 +40,9 @@ def finish_one_by_one(player_id, players_houses, battlefield, roll):
         return return_arr
 
 def max_on_board(player_id, players_houses, battlefield, roll):
-    # deploy new player when possible
+    """
+    Deploys new characteres when possible
+    """
     our_positions = [-1]
     return_arr = [0, 0, 0]
     for (i, battlefield_field) in enumerate(battlefield):
@@ -63,8 +67,10 @@ def max_on_board(player_id, players_houses, battlefield, roll):
         return return_arr
 
 def aggressive(player_id, players_houses, battlefield, roll):
-    # deploy new player when possible
-    # kill when possible
+    """
+    Deploys when possible
+    Kills when possible
+    """
     our_positions = []
     return_arr = [0, 0, 0]
     for (i, battlefield_field) in enumerate(battlefield):
@@ -95,9 +101,11 @@ def aggressive(player_id, players_houses, battlefield, roll):
         return return_arr
 
 def smart_ai(player_id, players_houses, battlefield, roll):
-    # deploy new player when we have less than 2 on battlefield and second player is in the second half
-    # try to stay behind enemy players in first three quarters of the battlefield
-    # kill when possible
+    """
+    Deploys new player when has less than 2 on the battlefield and second character is in the second half
+    Tries to stay behind enemy players in first three quarters of the battlefield
+    Kills when possible
+    """
     our_positions = []
     return_arr = [0, 0, 0]
     for (i, battlefield_field) in enumerate(battlefield):
@@ -131,32 +139,42 @@ def smart_ai(player_id, players_houses, battlefield, roll):
 # AI functions end
 
 def init_battlefield():
-    # Create 1D array to store players positions
-    battlefield = [] #40
+    """
+    Creates 1D array to store players positions
+    """
+    battlefield_init = [] #40
     i = 0
     while i <= 40:
-        battlefield.append("-")
+        battlefield_init.append("-")
         i += 1
-    return battlefield
+    return battlefield_init
 
-def init_player_houses(players_num):
+def init_player_houses():
+    """
+    Initilizes player start buffer
+    """
     i = 0
-    players_houses = []
-    while i <= players_num:
-        players_houses.append(4)
+    players_houses_init = []
+    while i <= PLAYERS_NUM:
+        players_houses_init.append(4)
         i += 1
-    return players_houses
+    return players_houses_init
 
-def init_player_finish(players_num):
+def init_player_finish():
+    """
+    Initializes finish houses for each player
+    """
     i = 0
-    players_finish = []
-    while i <= players_num:
-        players_finish.append([0,0,0,0,1,1])
+    players_finish_init = []
+    while i <= PLAYERS_NUM:
+        players_finish_init.append([0, 0, 0, 0, 1, 1]) # Fill the end with 1s to signalize over-roll
         i += 1
-    return players_finish
+    return players_finish_init
 
 def roll():
-    # Random between 1-6
+    """
+    Random between 1-6
+    """
     return random.randint(1, 6)
 
 def turn(player_id, players_houses, players_finish, battlefield, roll):
@@ -206,11 +224,12 @@ def turn(player_id, players_houses, players_finish, battlefield, roll):
         return 0
 
 def game_status_refresh(player_id, players_houses, battlefield):
-    # Check if there is winner
-    # 0 = game is over, we have a winner!
-    # 1 = game is running
-
-    for (i, battlefield_field) in enumerate(battlefield):
+    """
+    Checks if there is winner
+    0 = game is over, we have a winner!
+    1 = game is running
+    """
+    for battlefield_field in enumerate(battlefield):
         if battlefield_field == player_id:
             return 1
     if players_houses[player_id] == 0:
@@ -218,7 +237,7 @@ def game_status_refresh(player_id, players_houses, battlefield):
 
 print("pr01.py starting...")
 
-players_num = 4
+PLAYERS_NUM = 4
 player_victories = []
 
 chart_run = 0
@@ -230,27 +249,27 @@ if len(sys.argv) > 1:
     # PyChart run requested, using sys.argv[1] as run count
     chart_run = 1
     run_counter = int(sys.argv[1]) - 1
-    i = 0
-    while i < players_num:
+    j = 0
+    while j < PLAYERS_NUM:
         player_victories.append(0)
-        i += 1
+        j += 1
 
 print("Init battlefield...")
 battlefield = init_battlefield()
-players_finish = init_player_finish(players_num)
+players_finish = init_player_finish()
 
 print("Init players...")
-players_houses = init_player_houses(players_num)
+players_houses = init_player_houses()
 
 while game_status != 0:
-    while player_id <= players_num:
+    while player_id <= PLAYERS_NUM:
         roll_num = roll()
         turn(player_id, players_houses, players_finish, battlefield, roll_num)
         while roll_num == 6:
             roll_num = roll()
             turn(player_id, players_houses, players_finish, battlefield, roll_num)
-        for (i, battlefield_field) in enumerate(battlefield):
-            print(battlefield_field, end="")
+        for (j, battlefield_field_preview) in enumerate(battlefield):
+            print(battlefield_field_preview, end="")
         print("")
         game_status = game_status_refresh(player_id, players_houses, battlefield)
         if game_status == 0:
@@ -260,9 +279,9 @@ while game_status != 0:
                 game_status = 1
                 print("Reinit battlefield...")
                 battlefield = init_battlefield()
-                players_finish = init_player_finish(players_num)
+                players_finish = init_player_finish()
                 print("Reinit players...")
-                players_houses = init_player_houses(players_num)
+                players_houses = init_player_houses()
                 run_counter -= 1
                 print("Run Counter: " + str(run_counter))
                 player_victories[player_id] += 1
@@ -270,13 +289,13 @@ while game_status != 0:
                 break
             break
         player_id += 1
-        if player_id == players_num:
+        if player_id == PLAYERS_NUM:
             player_id = 0
 
 # Generate graph
 if chart_run == 1:
     data = [go.Bar(
-            x=['finish_one_by_one', 'max_on_board', 'aggressive', 'smart_ai'],
-            y=player_victories
+        x=['finish_one_by_one', 'max_on_board', 'aggressive', 'smart_ai'],
+        y=player_victories
     )]
     plotly.offline.plot(data, filename='basic-bar')
